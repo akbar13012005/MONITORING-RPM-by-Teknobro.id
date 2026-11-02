@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>RPM Monitor | TeknoBro</title>
+<style>
+:root{--bg:#0b1220;--bd:#22304f;--tx:#e8eefc;--mut:#7c8db0;--ac:#22a7f0;--ok:#22c55e;--bad:#ef4444;--card:linear-gradient(150deg,#16233f,#0f192e)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--tx);font-family:system-ui,"Segoe UI",Roboto,sans-serif;
+  background:radial-gradient(900px 500px at 15% -10%,#12315a55,transparent),radial-gradient(700px 400px at 100% 100%,#0e3a5a40,transparent),var(--bg);
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+aside{border-right:1px solid var(--bd);background:#0a1020cc;padding:18px 16px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100vh}
+.logo{background:#fff;border-radius:14px;padding:8px 14px}
+.logo img{display:block;width:100%;max-height:120px;object-fit:contain}
+.navi{background:linear-gradient(135deg,#1d7fe0,#2563eb);border-radius:12px;padding:12px 14px;font-weight:700;box-shadow:0 6px 20px #2563eb40}
+.navi small{display:block;font-weight:400;opacity:.8;margin-top:2px}
+.qs{display:flex;flex-direction:column;gap:8px}
+.qs h4{margin:4px 2px;font-size:12px;color:var(--mut);font-weight:600}
+.qs div{display:flex;justify-content:space-between;background:#ffffff08;border:1px solid #ffffff0a;border-radius:10px;padding:10px 12px;font-size:14px}
+.qs b{font-variant-numeric:tabular-nums}.qs span{color:var(--mut)}
+.foot{margin-top:auto;font-size:12px;color:var(--mut);display:flex;align-items:center;gap:8px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--bad);box-shadow:0 0 8px var(--bad)}
+.on .dot,.dot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+main{padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0;max-width:1200px;width:100%}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px 18px;transition:border-color .3s,box-shadow .3s}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.3px}
+.head p{margin:4px 0 0;color:var(--mut);font-size:14px}
+.acts{display:flex;gap:10px;align-items:center}
+.badge{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--bad);background:#ef444418;border:1px solid #ef444440;border-radius:99px;padding:8px 14px}
+.badge.on{color:var(--ok);background:#22c55e18;border-color:#22c55e40}.badge.boot{color:var(--ac);background:#22a7f018;border-color:#22a7f040}
+.badge.boot .dot{background:var(--ac);box-shadow:0 0 8px var(--ac)}
+button{font:inherit;font-weight:600;color:#fff;background:linear-gradient(135deg,#1d9bf0,#2563eb);border:0;border-radius:10px;padding:10px 16px;cursor:pointer}
+button:hover{filter:brightness(1.1)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+#alarm{background:#ef444422;border:1px solid var(--bad);color:#fecaca;border-radius:12px;padding:12px 16px;font-weight:700;animation:pl 1s infinite alternate}
+#alarm[hidden]{display:none}
+@keyframes pl{to{background:#ef444455}}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi{display:flex;justify-content:space-between;align-items:flex-start}
+.kpi small{color:var(--mut);font-size:13px}
+.kpi b{display:block;font-size:28px;margin-top:8px;font-variant-numeric:tabular-nums}.kpi b i{font-style:normal;font-size:14px;color:var(--mut);font-weight:500;margin-left:4px}
+.ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#22a7f01f;color:var(--ac)}
+.ic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ic.g{background:#22c55e1f;color:var(--ok)}.ic.p{background:#a78bfa22;color:#a78bfa}.ic.o{background:#f973161f;color:#f97316}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px}
+.card h2{margin:0 0 8px;font-size:16px;font-weight:700}
+.card.alert{border-color:var(--bad);box-shadow:0 0 24px #ef444455}
+#g{display:block;width:100%;max-width:440px;margin:0 auto;height:auto}
+#g text{fill:var(--tx);font-family:inherit}
+.upd{text-align:center;font-size:13px;color:var(--mut);margin-top:4px}
+#ch{width:100%;height:290px;display:block;touch-action:pan-y}
+.zb{display:flex;height:14px;border-radius:99px;overflow:hidden;background:#ffffff10;margin:6px 0 12px}
+.zb span{transition:width .6s}
+.lg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:13px;color:var(--mut)}
+.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}.lg b{color:var(--tx);float:right;font-variant-numeric:tabular-nums}
+.set{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px;font-size:14px;color:var(--mut)}
+input{font:inherit;color:var(--tx);background:#0a1020;border:1px solid var(--bd);border-radius:10px;padding:9px 12px;width:130px}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:6px 0 2px}footer a{color:var(--ac);text-decoration:none}
+@media(max-width:980px){.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+@media(max-width:820px){.app{grid-template-columns:1fr}
+  aside{position:static;height:auto;flex-direction:row;align-items:center;padding:10px 16px;border:0;border-bottom:1px solid var(--bd)}
+  aside .logo{width:120px;padding:4px 8px}.navi,.qs,.foot{display:none}main{padding:14px}h1{font-size:20px}}
+@media(max-width:480px){.kpi b{font-size:22px}.acts{width:100%;justify-content:space-between}}
+@media(prefers-reduced-motion:reduce){#alarm{animation:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="logo"><img src="logo.png" alt="TeknoBro"></div>
+  <div class="navi">Monitoring RPM<small>Real-time monitoring</small></div>
+  <div class="qs"><h4>Ringkasan</h4>
+    <div><span>Status</span><b id="qs1">Offline</b></div>
+    <div><span>RPM</span><b id="qs2">--</b></div>
+    <div><span>Beban</span><b id="qs3">--</b></div>
+    <div><span>Update</span><b id="qs4">--</b></div>
+  </div>
+  <div class="foot"><i class="dot" id="sd"></i><span id="st">System offline</span></div>
+</aside>
+<main>
+  <div class="card head">
+    <div><h1 id="title"></h1><p>Pantau kecepatan putar mesin secara langsung dari mana saja</p></div>
+    <div class="acts"><span class="badge" id="bd"><i class="dot"></i><span id="bt">OFFLINE</span></span><button id="exp">Ekspor CSV</button></div>
+  </div>
+  <div id="alarm" hidden>Peringatan: RPM melewati batas alarm</div>
+  <div class="kpis">
+    <div class="card kpi"><div><small>RPM saat ini</small><b id="k1">--</b></div><div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div></div>
+    <div class="card kpi"><div><small>Puncak 60 menit</small><b id="k2">--</b></div><div class="ic o"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg></div></div>
+    <div class="card kpi"><div><small>Rata-rata 60 menit</small><b id="k3">--</b></div><div class="ic p"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></div></div>
+    <div class="card kpi"><div><small>Beban dari skala</small><b id="k4">--</b></div><div class="ic g"><svg viewBox="0 0 24 24"><path d="M12 12l4-4M3 14a9 9 0 1 1 18 0"/></svg></div></div>
+  </div>
+  <div class="grid">
+    <div class="card" id="gc"><h2 id="sub"></h2>
+      <svg id="g" viewBox="0 0 300 245" role="img" aria-label="Gauge RPM"></svg>
+      <div class="upd" id="upd">Menunggu data...</div>
+    </div>
+    <div class="card"><h2>Tren RPM (60 menit terakhir)</h2><canvas id="ch"></canvas></div>
+  </div>
+  <div class="grid">
+    <div class="card"><h2>Waktu di tiap zona</h2>
+      <div class="zb"><span id="s0" style="background:#22c55e"></span><span id="s1" style="background:#fbbf24"></span><span id="s2" style="background:#f97316"></span><span id="s3" style="background:#ef4444"></span></div>
+      <div class="lg"><div><i style="background:#22c55e"></i>Aman<b id="z0">0%</b></div><div><i style="background:#fbbf24"></i>Waspada<b id="z1">0%</b></div><div><i style="background:#f97316"></i>Tinggi<b id="z2">0%</b></div><div><i style="background:#ef4444"></i>Kritis<b id="z3">0%</b></div></div>
+    </div>
+    <div class="card"><h2>Batas alarm</h2>
+      <div class="set"><label for="lim">RPM maksimum</label><input id="lim" type="number" min="0" step="50"><span>Isi 0 untuk mematikan alarm.</span></div>
+    </div>
+  </div>
+  <footer>Powered by <a href="https://teknobro.id">teknobro.id</a></footer>
+</main>
+</div>
+<script>
+// ================= PENGATURAN =================
+const DB_URL = "https://polinela-monitoring-rpm-mesin-default-rtdb.asia-southeast1.firebasedatabase.app";
+const TITLE = "MONITORING RPM MESIN PENGADUK", SUBTITLE = "Kecepatan putar mesin pengaduk";
+const GAUGE_MAX = 5000, OFFLINE_MS = 10000, HISTORY_MIN = 60, GAP_MS = 45000;
+// ==============================================
+const $ = id => document.getElementById(id), fmt = n => Math.round(n).toLocaleString("id-ID");
+$("title").textContent = TITLE; $("sub").textContent = SUBTITLE;
+let limit = 4500;
+try { const s = localStorage.getItem("rpmLimit"); if (s !== null) limit = +s || 0; } catch (_) {}
+$("lim").value = limit;
+
+// ---- Gauge ----
+const CX = 150, CY = 150, R = 112, W = 16, A0 = 135, SW = 270;
+const COL = ["#22c55e", "#fbbf24", "#f97316", "#ef4444"], Z = [0, .6, .8, .9, 1];
+const ang = f => A0 + SW * f, pt = (r, a) => [CX + r * Math.cos(a * Math.PI / 180), CY + r * Math.sin(a * Math.PI / 180)];
+const arc = (a, b) => { const [x1, y1] = pt(R, ang(a)), [x2, y2] = pt(R, ang(b)); return `M${x1.toFixed(1)} ${y1.toFixed(1)}A${R} ${R} 0 ${(b - a) * SW > 180 ? 1 : 0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`; };
+const zi = f => f < .6 ? 0 : f < .8 ? 1 : f < .9 ? 2 : 3, zc = f => COL[zi(f)];
+let s = "";
+for (let i = 0; i < 4; i++) s += `<path d="${arc(Z[i], Z[i + 1])}" stroke="${COL[i]}" stroke-width="${W}" fill="none" opacity=".2"/>`;
+s += `<path id="va" fill="none" stroke-width="${W}" stroke-linecap="round" style="filter:drop-shadow(0 0 6px currentColor)"/>`;
+for (let i = 0; i <= 50; i++) {
+  const [x1, y1] = pt(R - W / 2 - 4, ang(i / 50)), [x2, y2] = pt(R - W / 2 - (i % 5 ? 8 : 13), ang(i / 50));
+  s += `<line class="tk" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke-width="${i % 5 ? 1 : 2}"/>`;
+}
+for (let i = 0; i <= 5; i++) { const [x, y] = pt(R - W / 2 - 28, ang(i / 5)); s += `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="11" style="fill:var(--mut)">${fmt(GAUGE_MAX * i / 5)}</text>`; }
+s += ``;
+s += `<g id="nd"><polygon points="-14,-4 94,0 -14,4" fill="#f8fafc" style="filter:drop-shadow(0 0 4px #22a7f0)"/></g><circle cx="150" cy="150" r="12" fill="#0b1220" stroke="#22a7f0" stroke-width="3"/><circle cx="150" cy="150" r="3.5" fill="#22a7f0"/>`;
+s += `<text id="val" x="150" y="205" text-anchor="middle" font-size="40" font-weight="800" style="font-variant-numeric:tabular-nums;paint-order:stroke;stroke:#0f192e;stroke-width:5px">--</text><text x="150" y="226" text-anchor="middle" font-size="13" style="fill:var(--mut)">RPM</text>`;
+$("g").innerHTML = s;
+const tk = [...document.querySelectorAll(".tk")], va = $("va");
+
+// ---- Animasi: sapuan awal ala speedometer, lalu jarum mengikuti data ----
+let cur = 0, tgt = 0, boot = performance.now(), raf = 0;
+const UP = 1600, HOLD = 250, DN = 1200;
+function frame(now) {
+  raf = 0;
+  if (boot !== null) {
+    const t = now - boot; let v;
+    if (t < UP) v = 1 - Math.pow(1 - t / UP, 3);
+    else if (t < UP + HOLD) v = 1;
+    else if (t < UP + HOLD + DN) { const x = (t - UP - HOLD) / DN; v = 1 - x * x * (3 - 2 * x); }
+    else { v = 0; boot = null; }
+    cur = Math.max(0, v) * GAUGE_MAX;
+    if (boot === null) render();
+  } else { cur += (tgt - cur) * .12; if (Math.abs(tgt - cur) < .5) cur = tgt; }
+  paint();
+  if (boot !== null || cur !== tgt) raf = requestAnimationFrame(frame);
+}
+const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+function paint() {
+  const f = Math.min(1, Math.max(0, cur / GAUGE_MAX)), c = zc(f), live = online || boot !== null;
+  $("nd").setAttribute("transform", `translate(150 150) rotate(${ang(f).toFixed(2)})`);
+  va.setAttribute("d", f > .004 ? arc(0, f) : ""); va.style.stroke = c; va.style.color = c;
+  tk.forEach((t, i) => t.style.stroke = i / 50 <= f && live ? "#e2e8f0" : "#3a4a6b");
+  const v = $("val"); v.textContent = live ? fmt(cur) : "--"; v.style.fill = live ? c : "";
+}
+
+// ---- Data & tampilan ----
+let rpm = null, lastRecv = 0, online = false, first = true;
+const hhmm = t => { const d = new Date(t); return pad2(d.getHours()) + ":" + pad2(d.getMinutes()); };
+const pad2 = n => String(n).padStart(2, "0");
+const hhmmss = t => hhmm(t) + ":" + pad2(new Date(t).getSeconds());
+function render() {
+  const b = boot !== null, on = online && rpm !== null, f = on ? rpm / GAUGE_MAX : 0;
+  $("bd").className = "badge" + (b ? " boot" : on ? " on" : "");
+  $("bt").textContent = b ? "INISIALISASI" : on ? "ONLINE" : "OFFLINE";
+  $("sd").className = "dot" + (on ? " on" : ""); $("st").textContent = on ? "System online" : "System offline";
+  tgt = on ? rpm : 0;
+  $("k1").innerHTML = on ? fmt(rpm) + "<i>RPM</i>" : "--";
+  $("k4").innerHTML = on ? Math.round(f * 100) + "<i>%</i>" : "--";
+  $("qs1").textContent = on ? "Online" : "Offline"; $("qs2").textContent = on ? fmt(rpm) : "--"; $("qs3").textContent = on ? Math.round(f * 100) + " %" : "--";
+  const t = lastRecv ? hhmmss(lastRecv) : "--"; $("qs4").textContent = t;
+  $("upd").textContent = on ? "Update terakhir: " + t : lastRecv ? "Perangkat tidak mengirim data (terakhir " + t + ")" : "Menunggu data...";
+  const al = on && limit > 0 && rpm >= limit;
+  $("alarm").hidden = !al; $("gc").classList.toggle("alert", al);
+  if (al) $("alarm").textContent = "Peringatan: RPM " + fmt(rpm) + " melewati batas alarm " + fmt(limit);
+  kick();
+}
+function apply(path, data) {
+  let v;
+  if (path === "/") {
+    if (!data || typeof data.rpm !== "number") return;
+    v = data.rpm;
+    if (first && data.ts && Date.now() - data.ts > 60000) { first = false; rpm = v; lastRecv = data.ts; render(); return; }  // data lama, bukan siaran langsung
+  } else if (path === "/rpm" && typeof data === "number") v = data; else return;
+  first = false; rpm = v; lastRecv = Date.now(); online = true;
+  const last = pts[pts.length - 1];
+  if (!last || lastRecv - last[0] >= 10000) { pts.push([lastRecv, rpm]); drawChart(); }
+  render();
+}
+setInterval(() => {
+  const on = lastRecv > 0 && Date.now() - lastRecv < OFFLINE_MS;
+  if (on !== online) { online = on; render(); }
+}, 1000);
+
+// ---- Grafik riwayat ----
+let pts = [], hov = null, geo = null;
+async function loadHistory() {
+  try {
+    const d = await (await fetch(DB_URL + "/history.json", {cache: "no-store"})).json();
+    if (!d) return;
+    const min = Date.now() - HISTORY_MIN * 60000;
+    pts = Object.values(d).filter(x => x && typeof x.rpm === "number" && typeof x.t === "number" && x.t * 1000 >= min)
+      .map(x => [x.t * 1000, x.rpm]).sort((a, b) => a[0] - b[0]);
+    drawChart();
+  } catch (_) {}
+}
+function stats() {
+  const n = pts.length, zs = [0, 0, 0, 0];
+  pts.forEach(q => zs[zi(q[1] / GAUGE_MAX)]++);
+  $("k2").innerHTML = n ? fmt(Math.max(...pts.map(q => q[1]))) + "<i>RPM</i>" : "--";
+  $("k3").innerHTML = n ? fmt(pts.reduce((a, q) => a + q[1], 0) / n) + "<i>RPM</i>" : "--";
+  zs.forEach((c, i) => { const p = n ? c / n * 100 : 0; $("s" + i).style.width = p + "%"; $("z" + i).textContent = Math.round(p) + "%"; });
+}
+function drawChart() {
+  const c = $("ch"), dpr = devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+  if (!w) return;
+  const t1 = Date.now(), t0 = t1 - HISTORY_MIN * 60000;
+  pts = pts.filter(q => q[0] >= t0); stats();
+  c.width = w * dpr; c.height = h * dpr;
+  const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const mut = "#7c8db0", bd = "#22304f", AC = "#22a7f0";
+  const L = 50, Rm = 12, T = 10, B = 26, pw = w - L - Rm, ph = h - T - B;
+  const top = Math.max(GAUGE_MAX, Math.ceil(Math.max(0, limit, ...pts.map(q => q[1])) / 1000) * 1000);
+  const step = Math.max(1000, Math.ceil(top / 6000) * 1000);
+  const X = t => L + (t - t0) / (t1 - t0) * pw, Y = v => T + ph - v / top * ph;
+  geo = {X};
+  g.font = "11px system-ui,sans-serif"; g.lineWidth = 1; g.textBaseline = "middle";
+  for (let v = 0; v <= top; v += step) {
+    g.strokeStyle = bd; g.beginPath(); g.moveTo(L, Y(v)); g.lineTo(L + pw, Y(v)); g.stroke();
+    g.textAlign = "right"; g.fillStyle = mut; g.fillText(fmt(v), L - 6, Y(v));
+  }
+  g.textBaseline = "top";
+  [[t0, L, "left"], [(t0 + t1) / 2, L + pw / 2, "center"], [t1, L + pw, "right"]].forEach(([t, x, al]) => { g.textAlign = al; g.fillText(hhmm(t), x, T + ph + 8); });
+  if (limit > 0) {
+    g.strokeStyle = "#ef4444"; g.setLineDash([6, 4]); g.beginPath(); g.moveTo(L, Y(limit)); g.lineTo(L + pw, Y(limit)); g.stroke(); g.setLineDash([]);
+    g.fillStyle = "#ef4444"; g.textAlign = "right"; g.textBaseline = "bottom"; g.fillText("Batas alarm", L + pw, Y(limit) - 3);
+  }
+  if (!pts.length) { g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = mut; g.fillText("Belum ada data riwayat", L + pw / 2, T + ph / 2); return; }
+  const grad = g.createLinearGradient(0, T, 0, T + ph);
+  grad.addColorStop(0, "rgba(34,167,240,.45)"); grad.addColorStop(1, "rgba(34,167,240,.02)");
+  let seg = [];
+  const flush = () => {
+    if (seg.length === 1) { g.fillStyle = AC; g.beginPath(); g.arc(X(seg[0][0]), Y(seg[0][1]), 2.5, 0, 7); g.fill(); }
+    else if (seg.length > 1) {
+      g.beginPath(); g.moveTo(X(seg[0][0]), Y(seg[0][1])); seg.forEach(q => g.lineTo(X(q[0]), Y(q[1])));
+      g.strokeStyle = AC; g.lineWidth = 2; g.lineJoin = "round"; g.stroke();
+      g.lineTo(X(seg[seg.length - 1][0]), Y(0)); g.lineTo(X(seg[0][0]), Y(0)); g.closePath(); g.fillStyle = grad; g.fill();
+    }
+    seg = [];
+  };
+  pts.forEach((q, i) => { if (i && q[0] - pts[i - 1][0] > GAP_MS) flush(); seg.push(q); }); flush();
+  if (hov) {
+    const x = X(hov[0]), y = Y(hov[1]);
+    g.strokeStyle = mut; g.lineWidth = 1; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(x, T); g.lineTo(x, T + ph); g.stroke(); g.setLineDash([]);
+    g.fillStyle = AC; g.beginPath(); g.arc(x, y, 4.5, 0, 7); g.fill();
+    const bw = 110, bh = 42, bx = Math.min(Math.max(x - bw / 2, L), L + pw - bw), by = y > T + bh + 14 ? y - bh - 10 : y + 12;
+    g.fillStyle = "#0a1020"; g.strokeStyle = bd; g.beginPath(); g.roundRect(bx, by, bw, bh, 8); g.fill(); g.stroke();
+    g.textAlign = "left"; g.textBaseline = "middle"; g.fillStyle = "#e8eefc"; g.font = "600 13px system-ui,sans-serif"; g.fillText(fmt(hov[1]) + " RPM", bx + 10, by + 14);
+    g.font = "11px system-ui,sans-serif"; g.fillStyle = mut; g.fillText(hhmmss(hov[0]), bx + 10, by + 30);
+  }
+}
+function pick(e) {
+  if (!geo || !pts.length) return;
+  const mx = e.clientX - $("ch").getBoundingClientRect().left; let best = null, d0 = 1e9;
+  for (const q of pts) { const d = Math.abs(geo.X(q[0]) - mx); if (d < d0) { d0 = d; best = q; } }
+  hov = best; drawChart();
+}
+$("ch").addEventListener("pointermove", pick); $("ch").addEventListener("pointerdown", pick);
+$("ch").addEventListener("pointerleave", () => { hov = null; drawChart(); });
+addEventListener("resize", drawChart);
+
+// ---- Alarm & ekspor ----
+$("lim").addEventListener("change", e => {
+  limit = Math.max(0, +e.target.value || 0);
+  try { localStorage.setItem("rpmLimit", limit); } catch (_) {}
+  render(); drawChart();
+});
+$("exp").addEventListener("click", () => {
+  if (!pts.length) { alert("Belum ada data riwayat untuk diekspor."); return; }
+  const dts = t => { const d = new Date(t); return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()) + " " + hhmmss(t); };
+  const csv = ["waktu,rpm", ...pts.map(q => dts(q[0]) + "," + q[1])].join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], {type: "text/csv"}));
+  a.download = "rpm-" + dts(Date.now()).replace(/[: ]/g, "-") + ".csv";
+  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+});
+
+function connect() {
+  first = true;
+  const es = new EventSource(DB_URL + "/monitor.json");
+  for (const ev of ["put", "patch"]) es.addEventListener(ev, e => { try { const d = JSON.parse(e.data); apply(d.path, d.data); } catch (_) {} });
+  es.onerror = () => { es.close(); setTimeout(connect, 3000); };
+}
+render(); connect(); loadHistory(); drawChart();
+setInterval(loadHistory, 60000); setInterval(drawChart, 5000);
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>
